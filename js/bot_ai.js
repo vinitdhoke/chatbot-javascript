@@ -3,14 +3,14 @@ var BOTAI = [
     tags: "exception",
     query: [],
     res: [
-      "Hi, how may I help you?",
       "Sorry, could't find what you are looking",
+      "Hi, how may I help you??",
     ],
   },
   {
     tags: "greetings",
     query: ["hi", "hello", "hey", "there?"],
-    res: ["Hi, how may I help you?", "Hey"],
+    res: ["Hi, how may I help you???", "Hey"],
   },
   {
     tags: "url",
@@ -24,13 +24,12 @@ var BOTAI = [
   },
   { tags: "qa1 url", query: ["qa1"], res: ["qa1.com"] },
 ];
-
 var userInput = document.querySelector("input");
 var botResponses = document.querySelector(".bot-responses");
 var mostMatch = { tag: 0, percentage: 0 };
 
 function getMultipleChoiceTemplate(multipleChoice) {
-  let htm = `<div class='cls-choice'>Please select option from below:`;
+  let htm = `<sup class="bot-ic">bot</sup><div class='cls-choice'>Please select option from below:`;
   multipleChoice.forEach((choices) => {
     htm += `
         <div class="bot-msg-choice" onClick="sendClick('${choices}')">
@@ -41,12 +40,14 @@ function getMultipleChoiceTemplate(multipleChoice) {
 }
 function getBotResponseTemplate(res) {
   return `
+    <sup class="bot-ic">bot</sup>
     <div class="bot-msg">
         ${res}
     </div>`;
 }
 function getUserResponseTemplate(res) {
   return `
+      <sup class="user-ic">you</sup>
       <div class="user-msg">
           ${res}
       </div>`;
@@ -58,7 +59,12 @@ function attachBotInput(choiceInput) {
   BOTAI.forEach((botai) => checkQuery(botai, choiceInput));
   const index = BOTAI.findIndex((element) => element.tags == mostMatch.tag);
 
-  if (BOTAI[index].multipleChoice && BOTAI[index].multipleChoice.length > 0) {
+  if (index == -1) {
+    botResponses.innerHTML += getBotResponseTemplate(BOTAI[0].res[0]);
+  } else if (
+    BOTAI[index].multipleChoice &&
+    BOTAI[index].multipleChoice.length > 0
+  ) {
     botResponses.innerHTML += getMultipleChoiceTemplate(
       BOTAI[index].multipleChoice
     );
@@ -79,7 +85,7 @@ function checkQuery(botai, choiceInput) {
   const userInp = choiceInput.toLocaleLowerCase().split(" ");
 
   for (let i = 0; i < queries.length; i++) {
-    var found = 0;
+    let found = 0;
     const singleQuery = queries[i].split(" ");
     for (let j = 0; j < singleQuery.length; j++) {
       userInp.forEach((ui) => (found += ui == singleQuery[j] ? 1 : 0));
@@ -91,3 +97,8 @@ function checkQuery(botai, choiceInput) {
     }
   }
 }
+
+(function () {
+  attachBotInput("hi");
+  mostMatch = { tag: 0, percentage: 0 };
+})();
